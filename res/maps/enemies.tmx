@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="4" height="4" tilewidth="21" tileheight="21" infinite="0" nextlayerid="2" nextobjectid="1">
+ <tileset firstgid="1" source="tilemap_packed.tsx"/>
+ <layer id="1" name="Kachelebene 1" width="4" height="4">
+  <data encoding="csv">
+230,231,232,233,
+385,386,387,388,
+0,0,0,0,
+0,0,0,0
+</data>
+ </layer>
+</map>
