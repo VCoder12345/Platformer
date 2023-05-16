@@ -1,5 +1,6 @@
 package game;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -41,6 +42,9 @@ import enemy.Slime;
 import enemy.SlimeSystem;
 import mechanics.Door;
 import mechanics.DoorSystem;
+import mechanics.MovingPlatform;
+import mechanics.MovingPlatformSystem;
+import mechanics.Obstacle;
 import physics.AABBDrawSystem;
 import physics.Body;
 import physics.Physics;
@@ -95,7 +99,7 @@ public class Level extends Scene {
 		
 		Entity camera = new Entity("camera", 0, 900, Game.width, Game.height, 0);
 		camera.addComponent(new CameraComponent());
-		camera.addComponent(new CameraFollow(player, 0.08f));
+		camera.addComponent(new CameraFollow(player, 0.06f, 50));
 		addEntity(camera);
 		
 		DataLocator.provide(new RenderData(camera));
@@ -114,6 +118,7 @@ public class Level extends Scene {
 		addSystem(new DoorSystem());
 		addSystem(new JumpableSystem());
 		addSystem(new GhostSystem());
+		addSystem(new MovingPlatformSystem());
 	}
 	
 	private Entity createPlayer() {
@@ -151,7 +156,7 @@ public class Level extends Scene {
 				enterDoorAnim);
 		player.addComponent(statemachine);
 		
-		player.addComponent(new PlayerController(absTileSize * 2 + 12, 0.6f, 8.0f, statemachine));
+		player.addComponent(new PlayerController(absTileSize * 2 + 14, 0.7f, 7.0f, statemachine));
 		player.addComponent(new TrapDependent());
 		
 		return player;
@@ -161,10 +166,10 @@ public class Level extends Scene {
 		if(gob.type == null)
 			return;
 		Entity en = null;
+		Vector2 pos = gob.getPos().mul(tileZoom);
 		switch(gob.type) {
 		case "slime":
 			Vector2 size = new Vector2(absTileSize, absTileSize);
-			Vector2 pos = gob.getPos().mul(tileZoom);
 			boolean left = gob.getBoolProperty("left");
 			pos.y -= size.y;
 			en = new Entity("slime", pos.intVec(), size.intVec(), 5);
@@ -192,7 +197,6 @@ public class Level extends Scene {
 			break;
 		case "door":
 			size = new Vector2(absTileSize, absTileSize * 2);
-			pos = gob.getPos().mul(tileZoom);
 			pos.y -= size.y;
 			en = new Entity("door", pos.intVec(), size.intVec(), 13);
 			en.addComponent(Renderer.spriteRenderer(ResourceManager.getImage("door0")));
@@ -203,7 +207,6 @@ public class Level extends Scene {
 		case "ghost":
 			Vector2 limit = map.getGameObjectByID(gob.getIntProperty("limit")).getPos().mul(tileZoom);
 			size = new Vector2(absTileSize, absTileSize);
-			pos = gob.getPos().mul(tileZoom);
 			pos.y -= size.y;
 			en = new Entity("ghost", pos.intVec(), size.intVec(), 5);
 			en.addComponent(Renderer.spriteRenderer(ResourceManager.getImage("enemies4")));
@@ -212,6 +215,7 @@ public class Level extends Scene {
 			en.addComponent(new Trigger(GameTag.PLAYER));
 			en.addComponent(new Jumpable());
 			en.addComponent(new Ghost(2, pos, limit));
+			en.addComponent(new TrapDependent());
 			en.addTag(GameTag.GHOST);
 			
 			leftAnim = new ChangeImage(en, ResourceManager.getImage("enemies4"));
@@ -225,6 +229,19 @@ public class Level extends Scene {
 					new WaitAction(200),
 					new RunAction(en, x -> x.destroy()));
 			en.addComponent(new SimpleStateMachine(en, leftAnim, rightAnim, dieLeft, dieRight));
+			break;
+		case "platform":
+			size = gob.getSize().mul(tileZoom);
+			en = new Entity("platform", pos.intVec(), size.intVec(), 5);
+			en.addComponent(Renderer.rectRenderer(Color.cyan));
+			en.addComponent(new ShapeComponent(new AABB(0, 0, size.xToInt(), size.yToInt())));
+			en.addComponent(new Obstacle());
+			float speed = gob.getFloatProperty("speed");
+			Vector2 start = pos.intVec().copy();
+			Vector2 end = map.getGameObjectByID(gob.getIntProperty("end")).getPos().mul(tileZoom).intVec();
+			
+			Vector2 dist = start.sub(end);
+			en.addComponent(new MovingPlatform(speed, start, end, Math.abs(dist.x) > Math.abs(dist.y)));
 			break;
 		}
 		if(en != null) {

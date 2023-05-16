@@ -14,6 +14,7 @@ import com.danceEngine.ecs.Transform;
 import com.danceEngine.event.EventSystem;
 import com.danceEngine.game.Game;
 import com.danceEngine.resources.ResourceManager;
+import com.danceEngine.time.Time;
 import com.danceEngine.transition.FadeToBlackTransition;
 import com.danceEngine.utils.Utils;
 import com.danceEngine.utils.Vector2;
@@ -49,19 +50,20 @@ public class TrapSystem extends ESystem {
 		Transform t = e.getComponentByType(Transform.class);
 		
 		if(!tile.enabled) return;
+
 		switch(tile.type) {
 		case TRAMPOLINE:
 			if(dir != 1) break;
-			b.velocity.y = -25.0f;
+			b.velocity.y = -20.0f;
 			Physics.gameMaster.addAction(new SequenceAction(new RunAction(e, s -> {
 				tile.image = ResourceManager.getImage("objects1");
 				tile.enabled = false;
 				
 			}),
-					new WaitAction(500), new RunAction(e, s -> {
-						tile.image = ResourceManager.getImage("objects0");
-						tile.enabled = true;
-					})));
+			new WaitAction(500), new RunAction(e, s -> {
+				tile.image = ResourceManager.getImage("objects0");
+				tile.enabled = true;
+			})));
 			break;
 		case SPIKE:
 			Color red = new Color(139, 0, 0);
@@ -86,6 +88,17 @@ public class TrapSystem extends ESystem {
 			tile.image = ResourceManager.getImage("objects6");
 			tile.type = TileType.NONE;
 			Physics.checkpointState = Game.getCurrentScene();
+			break;
+		case BREAK_WALL:
+			if(dir != 1) break;
+			Lifetimer lt = (Lifetimer) tile.attribute;
+			
+			lt.lifetime -= Time.deltaTime;
+			System.out.println(lt.lifetime);
+			
+			if(lt.lifetime <= 0) {
+				tile.clear();
+			}
 			break;
 		}
 	}

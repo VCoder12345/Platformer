@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.4" tiledversion="1.4.3" name="tilemap_packed" tilewidth="21" tileheight="21" tilecount="900" columns="30">
+<tileset version="1.9" tiledversion="1.9.2" name="tilemap_packed" tilewidth="21" tileheight="21" tilecount="900" columns="30">
  <image source="tilemap_packed.png" width="630" height="630"/>
  <tile id="1">
   <properties>
@@ -140,6 +140,11 @@
   <properties>
    <property name="solid" type="bool" value="true"/>
   </properties>
+ </tile>
+ <tile id="70" class="spike">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="-0.0909091" y="12.7273" width="21" height="8.18182"/>
+  </objectgroup>
  </tile>
  <tile id="74">
   <properties>
@@ -416,6 +421,12 @@
    <property name="solid" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="220" class="break_wall">
+  <properties>
+   <property name="lifetime" type="float" value="0.06"/>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
  <tile id="230">
   <objectgroup draworder="index" id="2">
    <object id="1" x="3.91304" y="9.82609" width="13.087" height="10.0435"/>
@@ -511,7 +522,7 @@
    <property name="solid" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="283" type="trampoline">
+ <tile id="283" class="trampoline">
   <properties>
    <property name="solid" type="bool" value="true"/>
   </properties>
@@ -564,7 +575,7 @@
    <property name="solid" type="bool" value="true"/>
   </properties>
  </tile>
- <tile id="315" type="flag">
+ <tile id="315" class="flag">
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0.125" width="7.375" height="20.75"/>
   </objectgroup>
@@ -624,7 +635,7 @@
    <object id="1" x="2" y="-0.0909091" width="17.0909" height="21.1818"/>
   </objectgroup>
  </tile>
- <tile id="570" type="spike">
+ <tile id="570" class="spike">
   <properties>
    <property name="solid" type="bool" value="true"/>
   </properties>
@@ -632,7 +643,7 @@
    <object id="1" x="0" y="0.0625" width="20.875" height="10.6875"/>
   </objectgroup>
  </tile>
- <tile id="571" type="spike">
+ <tile id="571" class="spike">
   <properties>
    <property name="solid" type="bool" value="true"/>
   </properties>
@@ -640,7 +651,7 @@
    <object id="1" x="0.0625" y="0.1875" width="20.8125" height="13.5625"/>
   </objectgroup>
  </tile>
- <tile id="572" type="spike">
+ <tile id="572" class="spike">
   <properties>
    <property name="solid" type="bool" value="true"/>
   </properties>
@@ -648,7 +659,7 @@
    <object id="1" x="-0.0625" y="0.0625" width="21.6875" height="6.375"/>
   </objectgroup>
  </tile>
- <tile id="573" type="spike">
+ <tile id="573" class="spike">
   <properties>
    <property name="solid" type="bool" value="true"/>
   </properties>
@@ -656,7 +667,7 @@
    <object id="1" x="0" y="9.69764" width="21" height="11.3024"/>
   </objectgroup>
  </tile>
- <tile id="574" type="spike">
+ <tile id="574" class="spike">
   <properties>
    <property name="solid" type="bool" value="true"/>
   </properties>
@@ -664,7 +675,7 @@
    <object id="1" x="0" y="6.95652" width="21.0435" height="14.0435"/>
   </objectgroup>
  </tile>
- <tile id="575" type="spike">
+ <tile id="575" class="spike">
   <properties>
    <property name="solid" type="bool" value="true"/>
   </properties>
@@ -672,7 +683,7 @@
    <object id="1" x="8.32667e-17" y="13.6957" width="21" height="7.3913"/>
   </objectgroup>
  </tile>
- <tile id="603" type="spike"/>
+ <tile id="603" class="spike"/>
  <tile id="696">
   <properties>
    <property name="solid" type="bool" value="true"/>
@@ -734,6 +745,11 @@
   </properties>
  </tile>
  <tile id="849">
+  <properties>
+   <property name="solid" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="858">
   <properties>
    <property name="solid" type="bool" value="true"/>
   </properties>

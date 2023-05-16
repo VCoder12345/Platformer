@@ -18,12 +18,12 @@ public class MainGame {
 	public static void main(String[] args) throws IOException {
 		
 		
-		//Game.fpsDisplay = false;
+		Game.fpsDisplay = false;
 		Game.width = 2000;
 		Game game = new Game();
 		game.addScene(new Menu());
-		game.addScene(new Level("res/maps/up.tmx"));
-		game.loadScene(0);
+		game.addScene(new Level("res/maps/test.tmx"));
+		game.loadScene(1);
 		
 		defineControls();
 		loadResources();

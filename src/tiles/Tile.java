@@ -12,6 +12,7 @@ public class Tile {
 	public BufferedImage image;
 	public AABB aabb;
 	public boolean enabled = true;
+	public TileAttribute attribute = null;
 	
 	public Tile(BufferedImage image, AABB aabb) {
 		this.image = image;
@@ -23,5 +24,17 @@ public class Tile {
 		Tile tile = new Tile(null, null);
 		tile.solid = true;
 		return tile;
+	}
+	
+	public static Tile empty() {
+		Tile tile = new Tile(null, null);
+		tile.solid = false;
+		return tile;
+	}
+
+
+	public void clear() {
+		this.image = null;
+		this.solid = false;
 	}
 }

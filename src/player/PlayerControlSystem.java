@@ -63,7 +63,7 @@ public class PlayerControlSystem extends ESystem {
 			}
 			
 			if(b.onGround) {
-				if(Math.abs(b.velocity.x) < 0.2f) {
+				if(Math.abs(b.velocity.x) < 0.3f) {
 					pc.statemachine.changeState(2);
 				}else {
 					if(b.velocity.x < 0) {
@@ -86,7 +86,7 @@ public class PlayerControlSystem extends ESystem {
 			//friction
 			Vector2 friction = Vector2.zero();
 			friction.x = -b.velocity.normalized().x;
-			friction.x *= 0.4f;
+			friction.x *= 0.5f;
 			b.addForce(friction);
 			
 			

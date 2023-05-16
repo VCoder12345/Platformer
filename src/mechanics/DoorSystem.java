@@ -29,14 +29,18 @@ public class DoorSystem extends ESystem {
 	}
 	
 	public void onTrigger(TriggerEvent ev) {
+		
+		Entity oe = ev.oEntity;
+		PlayerController opc = oe.getComponentByType(PlayerController.class);
+		Body ob = oe.getComponentByType(Body.class);
+		
+		if(!ob.onGround) return;
 		Entity e = ev.entity;
 		Trigger tr = e.getComponentByType(Trigger.class);
 		Transform t = e.getComponentByType(Transform.class);
 		tr.enabled = false;
 		
-		Entity oe = ev.oEntity;
-		PlayerController opc = oe.getComponentByType(PlayerController.class);
-		Body ob = oe.getComponentByType(Body.class);
+
 		Transform ot = oe.getComponentByType(Transform.class);
 		ob.velocity.x = 0;
 		opc.enabled = false;

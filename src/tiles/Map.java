@@ -6,6 +6,8 @@ import com.danceEngine.tiled.Layer;
 import com.danceEngine.tiled.TileMap;
 import com.danceEngine.utils.Vector2;
 
+import traps.Lifetimer;
+
 public class Map {
 	public int w, h;
 	public Tile[][] tiles;
@@ -29,6 +31,7 @@ public class Map {
 				if(tl.hasProperty("solid")) {
 					tile.solid = tl.getProperty("solid").equals("true");
 				}
+				
 				if(tl.type != null) {
 					switch(tl.type) {
 					case "spike":
@@ -39,6 +42,10 @@ public class Map {
 						break;
 					case "flag":
 						tile.type = TileType.FLAG;
+						break;
+					case "break_wall":
+						tile.type = TileType.BREAK_WALL;
+						tile.attribute = new Lifetimer(tl.getFloatProperty("lifetime"));
 						break;
 					}
 				}

@@ -7,6 +7,7 @@ import com.danceEngine.event.EventSystem;
 import com.danceEngine.utils.Utils;
 import com.danceEngine.utils.Vector2;
 
+import mechanics.Obstacle;
 import tiles.Map;
 import tiles.Tile;
 import tiles.TileCollisionEvent;
@@ -72,6 +73,7 @@ public class PhysicsSystem extends ESystem {
 	}
 	
 	private void resolveCollisionsY(Entity e, Body b, ShapeComponent sc, Transform t) {
+		int dir = b.velocity.y < 0 ? 0 : 1;
 		Map map = Physics.map;
 		Vector2 min = sc.aabb.getMin(t);
 		Vector2 max = sc.aabb.getMax(t);
@@ -102,6 +104,16 @@ public class PhysicsSystem extends ESystem {
 			}
 		}
 		
+		float bestDist = Float.POSITIVE_INFINITY;
+		if(intersection != null) {
+			bestDist = Math.abs(t.position.y - intersection.y);
+		}
+		
+		Vector2 bestObstPos = checkObstacles(e, sc, t, bestDist, dir);
+		if(bestObstPos != null) {
+			intersection = bestObstPos;
+		}
+		
 		
 		if(intersection != null) {
 			if(b.velocity.y < 0) {
@@ -116,11 +128,11 @@ public class PhysicsSystem extends ESystem {
 			}
 		}
 		
-		checkTriggers(e, sc, t, b.velocity.y < 0 ? 0 : 1);
+		checkTriggers(e, sc, t, dir);
 		
 	}
 	
-	private Vector2 intersectsSolid(Entity entity ,Map map, int ix, int iy, Vector2 pos, Vector2 size, int dir) {
+	private Vector2 intersectsSolid(Entity entity, Map map, int ix, int iy, Vector2 pos, Vector2 size, int dir) {
 		Tile tile = map.get(ix, iy);
 		Vector2 trp = map.getBoxPos(ix, iy);
 		boolean negativeVel = dir % 2 == 0;
@@ -180,7 +192,40 @@ public class PhysicsSystem extends ESystem {
 		}
 	}
 	
+	private Vector2 checkObstacles(Entity oEntity,  ShapeComponent osc, Transform ot, float bestDistSqr, int dir) {
+		Vector2 bestObstPos = null;
+		Vector2 opos = osc.aabb.getMin(ot);
+		for(Entity obst : getEntitiesWithTypes(Obstacle.class, ShapeComponent.class, Transform.class)) {
+			Transform t = obst.getComponentByType(Transform.class);
+			ShapeComponent sc = obst.getComponentByType(ShapeComponent.class);
+			Vector2 pos = sc.aabb.getMin(t);
+			float distSqr;
+			if(dir < 2) {
+				distSqr = Math.abs(pos.y - opos.y);
+			}else {
+				distSqr = Math.abs(pos.x - opos.x);
+			}
+			
+			if(distSqr < bestDistSqr) {
+				if(Utils.rectRectIntersection(pos, sc.aabb.size, opos, osc.aabb.size)) {
+					EventSystem.submit(new CollisionEvent(obst, oEntity, dir));
+					bestObstPos = pos;
+					bestDistSqr = distSqr;
+					if(dir % 2 == 0) {
+						bestObstPos.addE(sc.aabb.size);
+					}
+					
+				}
+			}
+			
+			
+		}
+
+		return bestObstPos;
+	}
+	
 	private void resolveCollisionsX(Entity e, Body b,  ShapeComponent sc, Transform t) {
+		int dir = b.velocity.x < 0 ? 2 : 3;
 		Map map = Physics.map;
 		Vector2 min = sc.aabb.getMin(t);
 		Vector2 max = sc.aabb.getMax(t);
@@ -189,15 +234,17 @@ public class PhysicsSystem extends ESystem {
 		int startIy = map.getIndex(min.y);
 		int endIy = map.getIndex(max.y);
 		
+		boolean collision = false;
+		int intersx = 0;
 		collisionLoop:
 		for(int iy = startIy; iy <= endIy; ++iy) {
 			if(b.velocity.x < 0) {
 				for(int ix = endIx; ix >= startIx; --ix) {
 					Vector2 intersection = intersectsSolid(e, map, ix, iy, min, sc.aabb.size, 2);
 					if(intersection != null) {
-						int tilex = intersection.xToInt();
-						b.velocity.x = 0;
-						t.position.x = tilex + 1 - sc.aabb.pos.x;
+						collision = true;
+						intersx = intersection.xToInt();
+						
 						break collisionLoop;
 					}
 				}
@@ -205,16 +252,36 @@ public class PhysicsSystem extends ESystem {
 				for(int ix = startIx; ix <= endIx; ++ix) {
 					Vector2 intersection = intersectsSolid(e, map, ix, iy, min, sc.aabb.size, 3);
 					if(intersection != null) {
-						int tilex = intersection.xToInt();
-						b.velocity.x = 0;
-						t.position.x = tilex - sc.aabb.size.x - sc.aabb.pos.x - 1;
+						collision = true;
+						intersx = intersection.xToInt();
+						
 						break collisionLoop;
 					}
 				}
 			}
 		}
 		
-		checkTriggers(e, sc, t, b.velocity.x < 0 ? 2 : 3);
+		float bestDist = Float.POSITIVE_INFINITY;
+		if(collision) {
+			bestDist = Math.abs(t.position.x - intersx);
+		}
+		Vector2 bestObstPos = checkObstacles(e, sc, t, bestDist, dir);
+		if(bestObstPos != null) {
+			intersx = bestObstPos.xToInt();
+			collision = true;
+		}
+		
+		if(collision) {
+			if(b.velocity.x < 0) {
+				b.velocity.x = 0;
+				t.position.x = intersx + 1 - sc.aabb.pos.x;
+			}else {
+				b.velocity.x = 0;
+				t.position.x = intersx - sc.aabb.size.x - sc.aabb.pos.x - 1;
+			}
+		}
+		
+		checkTriggers(e, sc, t, dir);
 			
 	}
 
